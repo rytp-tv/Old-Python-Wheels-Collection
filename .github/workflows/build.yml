@@ -1,28 +1,25 @@
 name: Build Spacy Wheel
 
-on: [push, workflow_dispatch] # Запускать при push или вручную
+on: [push, workflow_dispatch]
 
 jobs:
   build_wheel:
-    runs-on: windows-latest # Использовать последнюю версию Windows Server
+    runs-on: windows-latest
 
     steps:
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.8'
         architecture: 'x64'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install wheel setuptools # Устанавливаем инструменты для сборки
+    - name: Install old setuptools
+      # ставим ту версию, при которой spaCy 2.1.9 ещё собирается
+      run: python -m pip install "setuptools<58" wheel
 
     - name: Build wheel
-      run: pip wheel spacy==2.1.9 --wheel-dir=./wheelhouse
+      run: pip wheel spacy==2.1.9 --wheel-dir=wheelhouse --no-build-isolation
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v4
       with:
-        name: spacy-wheel-py38-win-amd64
-        path: ./wheelhouse/*.whl # Загружаем собранный .whl файл
+        name: spacy-2.1.9-cp38-win_amd64
+        path: wheelhouse/*.whl
