@@ -22,7 +22,7 @@ jobs:
       run: pip wheel spacy==2.1.9 --wheel-dir=./wheelhouse
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: spacy-wheel-py38-win-amd64
         path: ./wheelhouse/*.whl # Загружаем собранный .whl файл
