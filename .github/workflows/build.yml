@@ -1,5 +1,4 @@
 name: Build Spacy Wheel
-
 on: [push, workflow_dispatch]
 
 jobs:
@@ -12,11 +11,19 @@ jobs:
         python-version: '3.8'
         architecture: 'x64'
 
-    - name: Install old setuptools
-      # ставим ту версию, при которой spaCy 2.1.9 ещё собирается
-      run: python -m pip install "setuptools<58" wheel
+    - name: Install build tools & deps
+      run: |
+        python -m pip install "setuptools<58" wheel cython
 
-    - name: Build wheel
+    - name: Pre-install build deps (no-isolation)  # <-- новый шаг
+      run: |
+        pip install --no-binary :all: murmurhash==1.0.13
+        pip install --no-binary :all: cymem==2.0.2
+        pip install --no-binary :all: preshed==2.0.1
+        pip install --no-binary :all: blis==0.2.4
+        pip install numpy==1.24.4  # уже есть wheel, ставим быстрее
+
+    - name: Build spaCy wheel
       run: pip wheel spacy==2.1.9 --wheel-dir=wheelhouse --no-build-isolation
 
     - uses: actions/upload-artifact@v4
